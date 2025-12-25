@@ -2,15 +2,26 @@ import pandas as pd
 def require_columns(df: pd.DataFrame, cols: list[str]) -> None:
     missing = [c for c in cols if c not in df.columns]
     assert not missing, f"Missing columns: {missing}"
+    """
+    هنا راح نتأكد من وجود كل الكولم راح يرسل رساله في حال كان في اي كولم مفقود
+
+    """
+
 
 def assert_non_empty(df: pd.DataFrame, name: str = "df") -> None:
     assert len(df) > 0, f"{name} has 0 rows"
+    """
+    نتحقق اذا الداتا فريم نفسها مو فاضيه يعني تحتوي على رو
+    """
 
 def assert_unique_key(df: pd.DataFrame, key: str, *, allow_na: bool = False) -> None:
     if not allow_na:
         assert df[key].notna().all(), f"{key} contains NA"
     dup = df[key].duplicated(keep=False) & df[key].notna()
     assert not dup.any(), f"{key} not unique; {dup.sum()} duplicate rows"
+    """
+    لازم الكي تكون يونيك و موجوده نتحقق من ان ماعندنا تكرار وايضا مافي كي نل
+    """
 
 def assert_in_range(s: pd.Series, lo=None, hi=None, name: str = "value") -> None:
     x = s.dropna()
@@ -18,3 +29,6 @@ def assert_in_range(s: pd.Series, lo=None, hi=None, name: str = "value") -> None
         assert (x >= lo).all(), f"{name} below {lo}"
     if hi is not None:
         assert (x <= hi).all(), f"{name} above {hi}"
+        """
+ راح يشل القيم المفقوده ويتحقق ان القيم في الرنج اذا كان في قيمه اعلى او اقل من الرنج راح يعطي رساله في اسمها 
+        """

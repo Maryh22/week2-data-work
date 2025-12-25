@@ -8,14 +8,9 @@ def enforce_orders_schema(df):
 
     df["order_id"] = df["order_id"].astype(str)
     df["user_id"] = df["user_id"].astype(str)
-
-    
     df["amount"] = pd.to_numeric(df["amount"], errors="coerce")
     df["quantity"] = pd.to_numeric(df["quantity"], errors="coerce")
-
-    
     df["created_at"] = pd.to_datetime(df["created_at"], errors="coerce")
-
     df["status"] = df["status"].astype(str).str.strip().str.lower()
 
     return df
@@ -33,12 +28,8 @@ def enforce_users_schema(df):
 
 
 def missingness_report(df: pd.DataFrame) -> pd.DataFrame:
-    return (
-        df.isna().sum()
-        .rename("n_missing")
-        .to_frame()
-        .assign(p_missing=lambda t: t["n_missing"] / len(df))
-        .sort_values("p_missing", ascending=False)
+    return (df.isna().sum() .rename("n_missing") .to_frame() .assign(p_missing=lambda t: t["n_missing"] / len(df)) .sort_values("p_missing", ascending=False)
+            #ترج عدد المسنق
     )
 
 def add_missing_flags(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
@@ -51,22 +42,17 @@ _ws = re.compile(r"\s+")
 
 def normalize_text(s: pd.Series) -> pd.Series:
     return (
-        s.astype("string")
-        .str.strip()
-        .str.casefold()
-        .str.replace(_ws, " ", regex=True)
+        s.astype("string").str.strip() .str.casefold() .str.replace(_ws, " ", regex=True)
     )
+
 
 def apply_mapping(s: pd.Series, mapping: dict[str, str]) -> pd.Series:
     return s.map(lambda x: mapping.get(x, x))
 
-import pandas as pd
 
 def dedupe_keep_latest(df: pd.DataFrame, key_cols: list[str], ts_col: str) -> pd.DataFrame:
     return (
-        df.sort_values(ts_col)
-          .drop_duplicates(subset=key_cols, keep="last")
-          .reset_index(drop=True)
+        df.sort_values(ts_col).drop_duplicates(subset=key_cols, keep="last").reset_index(drop=True)
     )
 
 def parse_datetime(df: pd.DataFrame, col: str, *, utc: bool = True) -> pd.DataFrame:
