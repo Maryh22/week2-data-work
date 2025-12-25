@@ -27,20 +27,20 @@ def main() -> None:
     orders_raw = read_orders_csv(p.raw / "orders.csv")
     users = read_users_csv(p.raw / "users.csv")
 
-    # Checks before transforms
+    
     require_columns(orders_raw, ["order_id", "user_id", "amount", "quantity", "created_at", "status"])
     require_columns(users, ["user_id", "country", "signup_date"])
     assert_non_empty(orders_raw, "orders_raw")
     assert_non_empty(users, "users")
 
-    # Enforce schema (Day 1)
+   
     orders = enforce_orders_schema(orders_raw)
 
-    # --- Day 2 artifacts: status_clean + missing flags + missingness report ---
+   
     reports_dir = ROOT / "reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
 
-    # 1) missingness report
+  
     missing_count = orders.isna().sum()
     missing_pct = (missing_count / len(orders)) if len(orders) else 0
     report = pd.DataFrame({"missing_count": missing_count, "missing_pct": missing_pct}).sort_values(
@@ -48,24 +48,24 @@ def main() -> None:
     )
     report.to_csv(reports_dir / "missingness_orders.csv", index=True)
 
-    # 2) status_clean (consistent categories)
+    
     orders["status_clean"] = (
         orders["status"].astype("string").str.strip().str.lower().replace({"refunded": "refund"})
     )
 
-    # 3) missing flags
+  
     orders["amount__isna"] = orders["amount"].isna()
     orders["quantity__isna"] = orders["quantity"].isna()
 
-    # Key checks
+  
     assert_unique_key(users, "user_id")
     assert_unique_key(orders, "order_id")
 
-    # Range checks (Task 7 style - fail fast)
+   
     assert_in_range(orders["amount"], lo=0, name="amount")
     assert_in_range(orders["quantity"], lo=0, name="quantity")
 
-    # Write outputs
+   
     write_parquet(orders, p.processed / "orders_clean.parquet")
     write_parquet(users, p.processed / "users.parquet")
     

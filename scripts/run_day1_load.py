@@ -10,15 +10,13 @@ def main() -> None:
     root = Path(".").resolve()
     p = make_paths(root)
 
-    # 1) Extract (read raw)
     orders_raw = read_orders_csv(p.raw / "orders.csv")
     users_raw = read_users_csv(p.raw / "users.csv")
 
-    # 2) Transform (clean)
     orders = enforce_orders_schema(orders_raw)
     users = enforce_users_schema(users_raw)
 
-    # 3) Load (write processed)
+  
     write_parquet(orders, p.processed / "orders.parquet")
     write_parquet(users, p.processed / "users.parquet")
 
